@@ -3,8 +3,8 @@
     <head>
         <title>Light square</title>
         <style>
-            #square { background-color: {{ color }};}
-            .centering { text-align: center; }
+            .centering {text-align: center;}
+            #square {border:1px solid #000000;}
         </style>
     </head>
     <body>
@@ -12,5 +12,15 @@
             <h1>Light square!</h1><br><br>
             <canvas id="square" width="500" height="500"></canvas>
         </div>
+        <script>
+            var ws = new WebSocket("ws://localhost:8000/ws");
+            function updateSquare(event) {
+                var square = document.getElementById("square");
+                var ctx = square.getContext("2d");
+                ctx.fillStyle = event.data;
+                ctx.fillRect(0, 0, square.width, square.height);
+            }
+            ws.onmessage = updateSquare;
+        </script>
     </body>
 </html> 
