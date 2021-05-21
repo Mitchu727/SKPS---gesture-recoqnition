@@ -1,4 +1,3 @@
-# host computer
 from fastapi import FastAPI, WebSocket, Request
 from fastapi.responses import HTMLResponse
 
