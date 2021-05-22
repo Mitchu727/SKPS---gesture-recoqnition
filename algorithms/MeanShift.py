@@ -11,7 +11,6 @@ class MeanShift(GestureClassifer):
         # get first frame
         self.roi = self.prepare_first_frame()
         self.roi_hist = self.get_histogram()
-        self.term = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1)
 
     def prepare_first_frame(self):
         # read first frame and set roi - region of interest with given location
@@ -27,15 +26,16 @@ class MeanShift(GestureClassifer):
         return cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
 
     def algorithm(self):
-        # Setup the termination criteria, either 10 iteration or move by atleast 1 pt
         # TODO while recogize gesture
         while True:
             _, frame = self.video.read()
             hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
             # find the same object with Back Projection based on histogram
             dst = cv.calcBackProject([hsv_frame], [0], self.roi_hist, [0, 180], 1)
+            # Setup the termination criteria, either 10 iteration or move by atleast 1 pt
+            term = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1)
             # apply meanshift to get the new location
-            _, self.loc = cv.meanShift(dst, self.loc, self.term)
+            _, self.loc = cv.meanShift(dst, self.loc, term)
             self.last_rois.append(self.loc)
             self.classify(self.last_rois)
             # show rectangle with mean that is working
