@@ -19,6 +19,7 @@
                 var ctx = square.getContext("2d");
                 ctx.fillStyle = event.data;
                 ctx.fillRect(0, 0, square.width, square.height);
+                ws.send("Received")
             }
             ws.onmessage = updateSquare;
         </script>
