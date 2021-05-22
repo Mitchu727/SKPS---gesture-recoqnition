@@ -1,5 +1,5 @@
 class GestureClassifer:
-    def __init__(self, classify_quan=5):
+    def __init__(self, classify_quan=30):
         self.classify_quan = classify_quan
 
     def classify(self, last_rois):
@@ -16,7 +16,7 @@ class GestureClassifer:
 
         min_width = min(sample, key=lambda x: x[0])
         max_width = max(sample, key=lambda x: x[0])
-        
+
         min_width_index = sample.index(min_width)
         max_width_index = sample.index(max_width)
 
@@ -27,3 +27,13 @@ class GestureClassifer:
 
     def choose_gesture(self, diff_hight_index, diff_hight, diff_width_index, diff_width):
         print(diff_hight_index, diff_hight, diff_width_index, diff_width)
+        if diff_hight > diff_width:
+            if diff_hight_index > 0:
+                print("Down")
+            else:
+                print("Up")
+        else:
+            if diff_width_index > 0:
+                print("Right")
+            else:
+                print("Left")

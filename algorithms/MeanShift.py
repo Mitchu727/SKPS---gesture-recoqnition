@@ -39,8 +39,8 @@ class MeanShift(GestureClassifer):
             self.last_rois.append(self.loc)
             self.classify(self.last_rois)
             # show rectangle with mean that is working
-            # img = cv.rectangle(frame, (self.loc[0], self.loc[1]), (self.loc[0] + self.loc[2], self.loc[1] + self.loc[3]), 255, 2)
-            # cv.imshow('img', img)
+            img = cv.rectangle(frame, (self.loc[0], self.loc[1]), (self.loc[0] + self.loc[2], self.loc[1] + self.loc[3]), 255, 2)
+            cv.imshow('img', img)
             key = cv.waitKey(30) & 0xff
             if key == 30:
                 break

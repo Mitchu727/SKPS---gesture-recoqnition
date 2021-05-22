@@ -2,9 +2,14 @@ import numpy as np
 import cv2 as cv
 from MeanShift import MeanShift
 
-cap = cv.VideoCapture('vtest.mp4')
+# TODO
+num = 2
+cap = cv.VideoCapture(f'vtest_{num}.mp4')
+loc_str = open("vtest_loc.txt", "r").readlines()[num - 1]
+loc = tuple(map(int, loc_str.split(', ')))
+
 while cap.isOpened():
-    meanshift = MeanShift(cap, (300, 200, 100, 50))
+    meanshift = MeanShift(cap, loc)
     meanshift.algorithm()
     if cv.waitKey(1) == ord('q'):
         break
