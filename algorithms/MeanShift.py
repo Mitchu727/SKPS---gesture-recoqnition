@@ -1,4 +1,4 @@
-from algorithms.GestureClassifier import GestureClassifer
+from algorithms.GestureClassifer import GestureClassifer
 import numpy as np
 import cv2 as cv
 
@@ -23,7 +23,7 @@ class MeanShift(GestureClassifer):
         hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])  # TODO poczytać o mask w calcHist and normalization
         return cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
 
-    def algorithm(self, frame):
+    def run(self, frame):
         hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         # find the same object with Back Projection based on histogram
         dst = cv.calcBackProject([hsv_frame], [0], self.roi_hist, [0, 180], 1)

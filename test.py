@@ -1,6 +1,6 @@
 import numpy as np
 import cv2 as cv
-from algorithms.MeanShift import MeanShift
+from algorithms.Tracker import Tracker
 
 def find_pink(img):
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
@@ -14,21 +14,18 @@ def find_pink(img):
         loc = cv.boundingRect(pink_area)
         return loc
 
+path = input("Enter path: ")
+if path == "":
+    path = "vtest/vtest_1.mp4"
 
-# TODO
-num = 1
-cap = cv.VideoCapture(f'vtest/vtest_{num}.mp4')
-# loc_str = open("vtest/vtest_loc.txt", "r").readlines()[num - 1]
-# loc = tuple(map(int, loc_str.split(', ')))
-
+cap = cv.VideoCapture(path)
 if cap.isOpened():
-    _, frame = cap.read()
-    loc = find_pink(frame)
-    meanshift = MeanShift(frame, loc)
-
+    # create tracker with chosen algorithm
+    tracker = Tracker(cap)
 while cap.isOpened():
+    # read frame and run step of algorithm
     _, frame = cap.read()
-    print(meanshift.algorithm(frame))
+    color = tracker.algorithm.run(frame)
     if cv.waitKey(1) == ord('q'):
         break
 cap.release()
