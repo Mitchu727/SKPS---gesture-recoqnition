@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 import cv2 as cv
-from algorithms import Tracker
+from algorithms.Tracker import Tracker
 import asyncio
 import uvicorn
 
