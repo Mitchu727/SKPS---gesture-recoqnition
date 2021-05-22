@@ -1,5 +1,7 @@
 from fastapi import FastAPI, WebSocket, Request
 from fastapi.responses import HTMLResponse
+import cv2 as cv
+from algorithms.MeanShift import MeanShift
 
 app = FastAPI()
 html = ""
@@ -14,8 +16,22 @@ async def get(request: Request):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    color = "#7FFFD4"
-    while color != "q":
-        color = input("Podaj kolor: ")
+
+    # TODO find hand
+    num = 2
+    # cap = cv.VideoCapture(f'vtest/vtest_{num}.mp4')
+    cap = cv.VideoCapture(0)
+    loc_str = open("vtest/vtest_loc.txt", "r").readlines()[num - 1]
+    loc = tuple(map(int, loc_str.split(', ')))
+
+    if cap.isOpened():
+        meanshift = MeanShift(cap, loc)
+    while cap.isOpened():
+        _, frame = cap.read()
+        color = meanshift.algorithm(frame)
         await websocket.send_text(color)
+        if cv.waitKey(1) == ord('q'):
+            break
     await websocket.close()
+    cap.release()
+    cv.destroyAllWindows()

@@ -8,9 +8,12 @@ cap = cv.VideoCapture(f'vtest/vtest_{num}.mp4')
 loc_str = open("vtest/vtest_loc.txt", "r").readlines()[num - 1]
 loc = tuple(map(int, loc_str.split(', ')))
 
-while cap.isOpened():
+if cap.isOpened():
     meanshift = MeanShift(cap, loc)
-    meanshift.algorithm()
+
+while cap.isOpened():
+    _, frame = cap.read()
+    print(meanshift.algorithm(frame))
     if cv.waitKey(1) == ord('q'):
         break
 cap.release()

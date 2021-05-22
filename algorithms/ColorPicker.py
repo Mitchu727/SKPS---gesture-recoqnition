@@ -61,4 +61,4 @@ class ColorPicker:
         # hsv 0,1 scaled to rgb
         rgb_color = [int(color * 255)for color in list(colorsys.hsv_to_rgb(n_hue, n_saturation, n_value))]
         # rgb to hex
-        return "".join([f"{v:02x}" for v in rgb_color])
+        return "#" + "".join([f"{v:02x}" for v in rgb_color])
