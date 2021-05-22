@@ -1,4 +1,4 @@
-from GestureClassifier import GestureClassifer
+from algorithms.GestureClassifier import GestureClassifer
 import numpy as np
 import cv2 as cv
 

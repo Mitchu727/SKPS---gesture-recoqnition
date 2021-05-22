@@ -26,7 +26,6 @@ class GestureClassifer:
         self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
 
     def choose_gesture(self, diff_hight_index, diff_hight, diff_width_index, diff_width):
-        print(diff_hight_index, diff_hight, diff_width_index, diff_width)
         if diff_hight > diff_width:
             if diff_hight_index > 0:
                 print("Down")
