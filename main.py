@@ -1,4 +1,4 @@
-from websockets.exceptions import ConnectionClosedOK
+import websockets.exceptions
 import asyncio
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -38,7 +38,7 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
             if data == "FindMyGlove":
                 tracker.update_init_loc(cap)
-    except WebSocketDisconnect and ConnectionClosedOK:
+    except WebSocketDisconnect and websockets.exceptions.ConnectionClosedOK:
         print("Connection closed")
     finally:
         await websocket.close()
