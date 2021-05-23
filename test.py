@@ -16,12 +16,12 @@ def find_pink(img):
 
 path = input("Enter path: ")
 if path == "":
-    path = "vtest/vtest_1.mp4"
+    path = "vtest/vtest_2.mp4"
 
 cap = cv.VideoCapture(path)
 if cap.isOpened():
     # create tracker with chosen algorithm
-    tracker = Tracker(cap)
+    tracker = Tracker(cap, algorithm="CamShift")
 while cap.isOpened():
     # read frame and run step of algorithm
     _, frame = cap.read()
