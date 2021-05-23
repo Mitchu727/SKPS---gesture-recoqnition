@@ -4,7 +4,7 @@ import numpy as np
 from tracklib.algorithms import Camshift, Meanshift, OpticalFlow, TemplateMatching
 
 class Tracker:
-    def __init__(self, video, algorithm="MeanShift"):
+    def __init__(self, video, algorithm="Meanshift"):
         self.init_loc, frame = self.find_pink_glove(video)
         self.algorithm = self.choose_algorithm(algorithm, frame)
 
@@ -28,15 +28,16 @@ class Tracker:
         self.algorithm.update_view(frame, self.init_loc)
 
     def choose_algorithm(self, algorithm, frame):
-        if algorithm == "MeanShift":
+        if algorithm == "Meanshift":
             return Meanshift(frame, self.init_loc)
-        elif algorithm == "CamShift":
+        elif algorithm == "Camshift":
             return Camshift(frame, self.init_loc)
         elif algorithm == "OpticalFlow":
             return OpticalFlow(frame, self.init_loc)
         elif algorithm == "TemplateMatching":
             return TemplateMatching(frame, self.init_loc)
-    
-    def change_algorithm(self, algorithm, video, frame):
-        self.update_init_loc(video)
-        self.choose_algorithm(algorithm, frame)
+
+    def change_algorithm(self, algorithm, video):
+        self.init_loc, frame = self.find_pink_glove(video)
+        self.algorithm = self.choose_algorithm(algorithm, frame)
+        # print(f"Current algorithm {self.algorithm.__class__.__name__}")

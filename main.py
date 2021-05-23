@@ -11,6 +11,8 @@ import uvicorn
 from tracklib.Tracker import Tracker
 
 app = FastAPI()
+app.camera = None
+app.tracker = None
 app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 html = ""
 with open('html/index.html', 'r') as f:
@@ -25,27 +27,28 @@ async def get():
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
-        cap = cv.VideoCapture(0, cv.CAP_DSHOW)
-        if cap.isOpened():
+        app.camera = cv.VideoCapture(0, cv.CAP_DSHOW)
+        if app.camera.isOpened():
             # create tracker with chosen algorithm
-            tracker = Tracker(cap)
-        while cap.isOpened():
+            app.tracker = Tracker(app.camera)
+        while app.camera.isOpened():
             # read frame and run step of algorithm
-            _, frame = cap.read()
-            color = tracker.algorithm.run(frame)
+            _, frame = app.camera.read()
+            color = app.tracker.algorithm.run(frame)
             # send color
             await websocket.send_text(color)
             # confirmation that client recived data, if there is no answer program stopped
             data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
             if data == "FindMyGlove":
-                tracker.update_init_loc(cap)
+                app.tracker.update_init_loc(app.camera)
             elif data != "Received":
-                tracker.change_algorithm(data, cap, frame)
+                app.tracker.change_algorithm(data, app.camera)
     except Exception:
         print("Connection closed")
     finally:
         await websocket.close()
-        cap.release()
+        app.camera.release()
+        app.camera = None
         cv.destroyAllWindows()
 
 # for debugging
