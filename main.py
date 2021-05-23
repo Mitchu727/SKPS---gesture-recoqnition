@@ -27,6 +27,7 @@ async def websocket_endpoint(websocket: WebSocket):
             # read frame and run step of algorithm
             _, frame = cap.read()
             color = tracker.algorithm.run(frame)
+            print(color)
             # send color
             await websocket.send_text(color)
             # confirmation that client recived data, if there is no answer program stopped

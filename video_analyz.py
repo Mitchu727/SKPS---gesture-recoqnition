@@ -2,9 +2,9 @@ import cv2 as cv
 from algorithms.Tracker import Tracker
 
 
-# path = input("Enter path: ")
-# if path == "":
-path = "vtest/vtest_2.mp4"
+path = input("Enter path: ")
+if path == "":
+    path = "vtest/vtest_2.mp4"
 
 cap = cv.VideoCapture(path)
 if cap.isOpened():
