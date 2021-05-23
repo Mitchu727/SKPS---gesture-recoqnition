@@ -2,7 +2,7 @@ from tracklib.GestureClassifer import GestureClassifer
 import numpy as np
 import cv2 as cv
 
-class MeanShift(GestureClassifer):
+class Meanshift(GestureClassifer):
     def __init__(self, first_frame, init_loc: tuple):
         super().__init__()
         # Setup the termination criteria, either 10 iteration or move by atleast 1 pt
@@ -44,7 +44,7 @@ class MeanShift(GestureClassifer):
         self.roi_hist = self.get_histogram()
 
 
-class Camshift(MeanShift):
+class Camshift(Meanshift):
     def run(self, frame):
         hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         # find the same object with Back Projection based on histogram

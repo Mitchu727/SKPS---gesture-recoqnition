@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-from tracklib.algorithms import Camshift, MeanShift, OpticalFlow, TemplateMatching
+from tracklib.algorithms import Camshift, Meanshift, OpticalFlow, TemplateMatching
 
 class Tracker:
     def __init__(self, video, algorithm="MeanShift"):
@@ -29,10 +29,14 @@ class Tracker:
 
     def choose_algorithm(self, algorithm, frame):
         if algorithm == "MeanShift":
-            return MeanShift(frame, self.init_loc)
+            return Meanshift(frame, self.init_loc)
         elif algorithm == "CamShift":
             return Camshift(frame, self.init_loc)
         elif algorithm == "OpticalFlow":
             return OpticalFlow(frame, self.init_loc)
         elif algorithm == "TemplateMatching":
             return TemplateMatching(frame, self.init_loc)
+    
+    def change_algorithm(self, algorithm, video, frame):
+        self.update_init_loc(video)
+        self.choose_algorithm(algorithm, frame)

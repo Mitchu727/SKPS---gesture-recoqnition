@@ -39,6 +39,8 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
             if data == "FindMyGlove":
                 tracker.update_init_loc(cap)
+            elif data != "Received":
+                tracker.change_algorithm(data, cap, frame)
     except WebSocketDisconnect and websockets.exceptions.ConnectionClosedOK and starlette.websockets.WebSocketDisconnect:
         print("Connection closed")
     finally:
