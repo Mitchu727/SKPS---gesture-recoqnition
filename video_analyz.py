@@ -1,5 +1,5 @@
 import cv2 as cv
-from algorithms.Tracker import Tracker
+from tracklib.Tracker import Tracker
 
 
 path = input("Enter path: ")

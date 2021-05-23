@@ -1,4 +1,4 @@
-from algorithms.GestureClassifer import GestureClassifer
+from tracklib.GestureClassifer import GestureClassifer
 import numpy as np
 import cv2 as cv
 

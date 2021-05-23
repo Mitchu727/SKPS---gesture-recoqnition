@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-from algorithms.algorithms import Camshift, MeanShift, OpticalFlow, TemplateMatching
+from tracklib.algorithms import Camshift, MeanShift, OpticalFlow, TemplateMatching
 
 class Tracker:
     def __init__(self, video, algorithm="MeanShift"):

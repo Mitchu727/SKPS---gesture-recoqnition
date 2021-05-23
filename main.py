@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 import cv2 as cv
 import uvicorn
 
-from algorithms.Tracker import Tracker
+from tracklib.Tracker import Tracker
 
 app = FastAPI()
 html = ""
