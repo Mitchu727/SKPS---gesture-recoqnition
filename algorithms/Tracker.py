@@ -1,5 +1,6 @@
 from algorithms.Camshift import Camshift
 from algorithms.MeanShift import MeanShift
+from algorithms.OpticalFlow import OpticalFlow
 import cv2 as cv
 import numpy as np
 
@@ -28,3 +29,5 @@ class Tracker:
             return MeanShift(frame, self.init_loc)
         elif algorithm == "CamShift":
             return Camshift(frame, self.init_loc)
+        elif algorithm == "OpticalFlow":
+            return OpticalFlow(frame, self.init_loc)
