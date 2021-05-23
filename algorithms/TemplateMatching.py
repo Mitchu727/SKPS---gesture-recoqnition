@@ -33,3 +33,9 @@ class TemplateMatching(GestureClassifer):
         frame = cv.rectangle(frame, (location[0], location[1]), (location[2], location[3]), 255, 2)
         cv.imshow('frame', frame)
         cv.waitKey(30) & 0xff
+
+    def update_view(self, frame, loc):
+        self.loc = loc
+        self.last_matching = [self.loc]
+        self.template = frame[self.loc[1]:self.loc[1] + self.loc[3], self.loc[0]:self.loc[0] + self.loc[2]]
+        # TODO method changer

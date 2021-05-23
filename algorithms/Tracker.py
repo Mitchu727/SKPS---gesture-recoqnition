@@ -25,6 +25,10 @@ class Tracker:
                 loc = cv.boundingRect(pink_area)
         return loc, frame
 
+    def update_init_loc(self, video):
+        self.init_loc, frame = self.find_pink_glove(video)
+        self.algorithm.update_view(frame, self.init_loc)
+
     def choose_algorithm(self, algorithm, frame):
         if algorithm == "MeanShift":
             return MeanShift(frame, self.init_loc)

@@ -12,6 +12,9 @@
             <h1>Light square!</h1><br><br>
             <canvas id="square" width="500" height="500"></canvas>
         </div>
+        <p class="centering">
+            <button type="button" onclick="findPinkGlove()">Find Pink Glove!</button>
+        </p>
         <script>
             var ws = new WebSocket("ws://localhost:8000/ws");
             function updateSquare(event) {
@@ -19,9 +22,14 @@
                 var ctx = square.getContext("2d");
                 ctx.fillStyle = event.data;
                 ctx.fillRect(0, 0, square.width, square.height);
-                ws.send("Received")
+                ws.send("Received");
             }
             ws.onmessage = updateSquare;
+
+            function findPinkGlove(event){
+                ws.send("FindMyGlove");
+            }
+
         </script>
     </body>
 </html> 

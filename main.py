@@ -4,6 +4,7 @@ import cv2 as cv
 from algorithms.Tracker import Tracker
 import asyncio
 import uvicorn
+import websockets
 
 app = FastAPI()
 html = ""
@@ -27,15 +28,16 @@ async def websocket_endpoint(websocket: WebSocket):
             # read frame and run step of algorithm
             _, frame = cap.read()
             color = tracker.algorithm.run(frame)
-            print(color)
             # send color
             await websocket.send_text(color)
             # confirmation that client recived data, if there is no answer program stopped
-            await asyncio.wait_for(websocket.receive_text(), timeout=5)
-    except WebSocketDisconnect:
+            data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
+            if data == "FindMyGlove":
+                tracker.update_init_loc(cap)
+    except WebSocketDisconnect and websockets.exceptions.ConnectionClosedOK:
         await websocket.close()
-        cap.release()
-        cv.destroyAllWindows()
+    cap.release()
+    cv.destroyAllWindows()
 
 # for debugging
 if __name__ == "__main__":
