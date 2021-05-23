@@ -1,21 +1,25 @@
 import numpy as np
 import cv2 as cv
-# from algorithm.GestureClassifer import GestureClassifer
+from algorithms.GestureClassifer import GestureClassifer
 
-class OpticalFlow:
+class OpticalFlow(GestureClassifer):
     def __init__(self, first_frame, init_loc):
+        super().__init__()
         self.prev_frame_gray = cv.cvtColor(first_frame, cv.COLOR_BGR2GRAY)
         self.prev_point = np.array([[init_loc[0] + init_loc[2] // 2, init_loc[1] + init_loc[3] // 2]], dtype=np.float32)
         self.lk_params = dict(winSize=(20, 20), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
+        self.last_rois = [tuple(self.prev_point[0])]
 
     def run(self, frame):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         # calculate optical flow
-        point, st, err = cv.calcOpticalFlowPyrLK(self.prev_frame_gray, frame_gray, self.prev_point, None, **self.lk_params)
+        self.prev_point, st, err = cv.calcOpticalFlowPyrLK(self.prev_frame_gray, frame_gray, self.prev_point, None, **self.lk_params)
         # save as previous params
         self.prev_frame_gray = frame_gray
-        self.prev_point = point
-        # self.draw(frame)
+        self.last_rois.append(tuple(self.prev_point[0]))
+        color = self.classify(self.last_rois)
+        self.draw(frame)
+        return color
     
     def draw(self, frame):
         # draw tracked circle

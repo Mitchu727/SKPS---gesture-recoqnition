@@ -1,4 +1,3 @@
-import numpy as np
 import cv2 as cv
 from algorithms.Tracker import Tracker
 
@@ -15,6 +14,7 @@ while cap.isOpened():
     # read frame and run step of algorithm
     _, frame = cap.read()
     color = tracker.algorithm.run(frame)
+    print(color)
     if cv.waitKey(1) == ord('q'):
         break
 cap.release()
