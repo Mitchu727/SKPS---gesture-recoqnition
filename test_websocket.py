@@ -20,12 +20,3 @@ def test_websocket_get_algorithm():
         sleep(3)
         assert app.tracker.algorithm.__class__.__name__ == "OpticalFlow"
 
-# @pytest.mark.parametrize("path", ["vtest/vtest_2.mp4"])
-# def test_websocket_change_location(path: str):
-#     client = TestClient(app)
-#     with client.websocket_connect("/ws") as websocket:
-#         prev_loc = app.tracker.init_loc
-#         app.camera = cv.VideoCapture(path)
-#         websocket.send_text("FindMyGlove")
-#         assert prev_loc != app.tracker.init_loc
-# TODO nagrać wideo ze znikającą rękawiczką
