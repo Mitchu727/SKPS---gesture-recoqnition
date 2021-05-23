@@ -41,7 +41,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 tracker.update_init_loc(cap)
             elif data != "Received":
                 tracker.change_algorithm(data, cap, frame)
-    except WebSocketDisconnect and websockets.exceptions.ConnectionClosedOK and starlette.websockets.WebSocketDisconnect:
+    except Exception:
         print("Connection closed")
     finally:
         await websocket.close()
