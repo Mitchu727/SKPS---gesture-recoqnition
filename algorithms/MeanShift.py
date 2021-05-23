@@ -8,15 +8,10 @@ class MeanShift(GestureClassifer):
         self.loc = init_loc
         self.last_rois = [self.loc]
         # get first frame
-        self.roi = self.prepare_first_frame(first_frame)
+        self.roi = first_frame[self.loc[1]:self.loc[1] + self.loc[3], self.loc[0]:self.loc[0] + self.loc[2]]
         self.roi_hist = self.get_histogram()
         # Setup the termination criteria, either 10 iteration or move by atleast 1 pt
         self.term = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1)
-
-    def prepare_first_frame(self, frame):
-        # read first frame and set roi - region of interest with given location
-        tracked = frame[self.loc[1]:self.loc[1] + self.loc[3], self.loc[0]:self.loc[0] + self.loc[2]]
-        return tracked
 
     def get_histogram(self):
         hsv_roi = cv.cvtColor(self.roi, cv.COLOR_BGR2HSV)
@@ -33,8 +28,11 @@ class MeanShift(GestureClassifer):
         _, self.loc = cv.meanShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
         color = self.classify(self.last_rois)
+        self.draw(frame)
+        return color
+
+    def draw(self, frame):
         # show rectangle with mean that is working
         img = cv.rectangle(frame, (self.loc[0], self.loc[1]), (self.loc[0] + self.loc[2], self.loc[1] + self.loc[3]), 255, 2)
         cv.imshow('img', img)
         cv.waitKey(30) & 0xff
-        return color

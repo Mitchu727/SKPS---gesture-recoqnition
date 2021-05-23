@@ -10,8 +10,5 @@ class Camshift(MeanShift):
         _, self.loc = cv.CamShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
         color = self.classify(self.last_rois)
-        # show rectangle with mean that is working
-        img = cv.rectangle(frame, (self.loc[0], self.loc[1]), (self.loc[0] + self.loc[2], self.loc[1] + self.loc[3]), 255, 2)
-        cv.imshow('img', img)
-        cv.waitKey(30) & 0xff
+        self.draw(frame)
         return color
