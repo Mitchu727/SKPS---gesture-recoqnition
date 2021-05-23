@@ -1,6 +1,7 @@
 from algorithms.Camshift import Camshift
 from algorithms.MeanShift import MeanShift
 from algorithms.OpticalFlow import OpticalFlow
+from algorithms.TemplateMatching import TemplateMatching
 import cv2 as cv
 import numpy as np
 
@@ -31,3 +32,5 @@ class Tracker:
             return Camshift(frame, self.init_loc)
         elif algorithm == "OpticalFlow":
             return OpticalFlow(frame, self.init_loc)
+        elif algorithm == "TemplateMatching":
+            return TemplateMatching(frame, self.init_loc)

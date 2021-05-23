@@ -9,7 +9,7 @@ path = "vtest/vtest_2.mp4"
 cap = cv.VideoCapture(path)
 if cap.isOpened():
     # create tracker with chosen algorithm
-    tracker = Tracker(cap, algorithm="OpticalFlow")
+    tracker = Tracker(cap, algorithm="TemplateMatching")
 while cap.isOpened():
     # read frame and run step of algorithm
     _, frame = cap.read()
