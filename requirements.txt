@@ -1,5 +1,10 @@
+# do strony internetowej
 fastapi==0.63.0
 uvicorn[standard]
 requests==2.25.1
+# do filmów
 numpy==1.20.3
 opencv-python==4.5.1.48
+# do ewentualnego wywalenia
+aiofiles==0.7.0
+pytest==6.2.3

@@ -2,6 +2,7 @@ from websockets.exceptions import ConnectionClosedOK
 import asyncio
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 import cv2 as cv
 import uvicorn
@@ -9,6 +10,7 @@ import uvicorn
 from tracklib.Tracker import Tracker
 
 app = FastAPI()
+app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 html = ""
 with open('html/index.html', 'r') as f:
     html = f.read()
@@ -37,9 +39,11 @@ async def websocket_endpoint(websocket: WebSocket):
             if data == "FindMyGlove":
                 tracker.update_init_loc(cap)
     except WebSocketDisconnect and ConnectionClosedOK:
+        print("Connection closed")
+    finally:
         await websocket.close()
-    cap.release()
-    cv.destroyAllWindows()
+        cap.release()
+        cv.destroyAllWindows()
 
 # for debugging
 if __name__ == "__main__":
