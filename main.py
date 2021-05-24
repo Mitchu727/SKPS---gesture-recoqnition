@@ -26,6 +26,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
         app.camera = cv.VideoCapture(0, cv.CAP_DSHOW)
+        app.camera.set(cv.CAP_PROP_FPS, 10)
         if app.camera.isOpened():
             # create tracker with chosen algorithm
             app.tracker = Tracker(app.camera)
@@ -43,6 +44,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 app.tracker.update_init_loc(app.camera)
             elif data != "Received":
                 app.tracker.change_algorithm(data, app.camera)
+            cv.waitKey(100)
     except Exception:
         print("Connection closed")
     finally:
