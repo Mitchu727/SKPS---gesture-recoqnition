@@ -1,10 +1,8 @@
-import websockets.exceptions
 import asyncio
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-import starlette.websockets
 import cv2 as cv
 import uvicorn
 
@@ -34,8 +32,10 @@ async def websocket_endpoint(websocket: WebSocket):
         while app.camera.isOpened():
             # read frame and run step of algorithm
             _, frame = app.camera.read()
-            color = app.tracker.algorithm.run(frame)
-            # send color
+            gesture = app.tracker.algorithm.run(frame)
+            if gesture:
+                color = app.tracker.color.convert_gesture(gesture)
+                # send color
             await websocket.send_text(color)
             # confirmation that client recived data, if there is no answer program stopped
             data = await asyncio.wait_for(websocket.receive_text(), timeout=5)

@@ -2,11 +2,13 @@ import cv2 as cv
 import numpy as np
 
 from tracklib.algorithms import Camshift, Meanshift, OpticalFlow, TemplateMatching
+from tracklib.GestureClassifer import ColorPicker
 
 class Tracker:
     def __init__(self, video, algorithm="Meanshift"):
         self.init_loc, frame = self.find_pink_glove(video)
         self.algorithm = self.choose_algorithm(algorithm, frame)
+        self.color = ColorPicker()
 
     def find_pink_glove(self, video):
         loc = None
@@ -40,4 +42,4 @@ class Tracker:
     def change_algorithm(self, algorithm, video):
         self.init_loc, frame = self.find_pink_glove(video)
         self.algorithm = self.choose_algorithm(algorithm, frame)
-        # print(f"Current algorithm {self.algorithm.__class__.__name__}")
+        print(f"Current algorithm {self.algorithm.__class__.__name__}")

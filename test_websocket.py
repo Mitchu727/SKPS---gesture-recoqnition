@@ -1,8 +1,6 @@
 from time import sleep
 
 from fastapi.testclient import TestClient
-import cv2 as cv
-import pytest
 
 from main import app
 
@@ -19,4 +17,3 @@ def test_websocket_get_algorithm():
         websocket.send_text("OpticalFlow")
         sleep(3)
         assert app.tracker.algorithm.__class__.__name__ == "OpticalFlow"
-

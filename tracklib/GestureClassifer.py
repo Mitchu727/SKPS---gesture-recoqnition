@@ -1,16 +1,15 @@
 import colorsys
 
 class GestureClassifer:
-    def __init__(self, classify_quan=30):
+    def __init__(self, classify_quan=10):
         self.classify_quan = classify_quan
-        self.color = ColorPicker()
+        self.classify_error = 10
 
     def classify(self, last_rois):
         sample = last_rois[-self.classify_quan:]
         diff_hight_index, diff_hight = self.hight_change(sample)
         diff_width_index, diff_width = self.width_change(sample)
-        self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
-        return self.color.get_hex()
+        return self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
 
     def hight_change(self, sample):
         min_hight = min(sample, key=lambda x: x[1])
@@ -35,16 +34,19 @@ class GestureClassifer:
         return diff_width_index, diff_width
 
     def choose_gesture(self, diff_hight_index, diff_hight, diff_width_index, diff_width):
-        if diff_hight > diff_width:
-            if diff_hight_index > 0:
-                self.color.sub_value()
+        if diff_hight > self.classify_error or diff_width > self.classify_error:
+            if diff_hight > diff_width:
+                if diff_hight_index > 0:
+                    return 1
+                else:
+                    return 2
             else:
-                self.color.add_value()
+                if diff_width_index > 0:
+                    return 3
+                else:
+                    return 4
         else:
-            if diff_width_index > 0:
-                self.color.add_hue()
-            else:
-                self.color.sub_hue()
+            return None
 
 
 class ColorPicker:
@@ -110,3 +112,14 @@ class ColorPicker:
         rgb_color = [int(color * 255)for color in list(colorsys.hsv_to_rgb(n_hue, n_saturation, n_value))]
         # rgb to hex
         return "#" + "".join([f"{v:02x}" for v in rgb_color])
+
+    def convert_gesture(self, gest_num):
+        if gest_num == 1:
+            self.sub_value()
+        elif gest_num == 2:
+            self.add_value()
+        elif gest_num == 3:
+            self.add_hue()
+        elif gest_num == 4:
+            self.sub_hue()
+        return self.get_hex()
