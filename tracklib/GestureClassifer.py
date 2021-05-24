@@ -17,7 +17,6 @@ class GestureClassifer:
             if 255 > color[2] > 128 and 209 > color[1] > 3 and 220 > color[0] > 40:
                 return 0  # stay in this localization
             else:
-                print(color)
                 return None  # find glove
 
     def classify_with_point(self, last_points, frame):
@@ -32,7 +31,6 @@ class GestureClassifer:
             if 255 > color[2] > 128 and 209 > color[1] > 3 and 220 > color[0] > 40:
                 return 0  # stay in this localization
             else:
-                print(color)
                 return None  # find glove
 
     def get_dominant_color(self, frame):

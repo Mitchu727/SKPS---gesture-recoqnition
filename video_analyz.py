@@ -1,11 +1,12 @@
 import cv2 as cv
 from tracklib.Tracker import Tracker
 
-path = "vtest/vtest.mp4"
+path = "vtest/vtest1.mp4"
 alg = "Meanshift"
 
-cap = cv.VideoCapture("vtest/vtest.mp4")
-# cap.set(cv.CAP_PROP_FPS, 10)
+gestures = []
+cap = cv.VideoCapture(path)
+cap.set(cv.CAP_PROP_FPS, 10)
 if cap.isOpened():
     tracker = Tracker(cap, algorithm=alg)
 while cap.isOpened():
@@ -14,10 +15,12 @@ while cap.isOpened():
         break
     if int(cap.get(cv.CAP_PROP_POS_FRAMES)) % 5 == 0:
         gesture = tracker.algorithm.run(frame)
-        print(gesture)
+        gestures.append(gesture)
         color = tracker.color.convert_gesture(gesture)
+        print(gestures)
         cv.waitKey(1)
 cap.release()
 cv.destroyAllWindows()
+print(gestures)
 
 # python -m profile video_analyz.py
