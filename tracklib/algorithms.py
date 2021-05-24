@@ -27,7 +27,7 @@ class Meanshift(GestureClassifer):
         # apply meanshift to get the new location
         _, self.loc = cv.meanShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
-        color = self.classify(self.last_rois, frame)
+        color = self.classify_with_coords(self.last_rois, frame)
         self.draw(frame)
         return color
 
@@ -52,7 +52,7 @@ class Camshift(Meanshift):
         # apply meanshift to get the new location
         _, self.loc = cv.CamShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
-        color = self.classify(self.last_rois, frame)
+        color = self.classify_with_coords(self.last_rois, frame)
         self.draw(frame)
         return color
 
@@ -63,7 +63,7 @@ class OpticalFlow(GestureClassifer):
         self.lk_params = dict(winSize=(20, 20), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
         self.prev_frame_gray = cv.cvtColor(first_frame, cv.COLOR_BGR2GRAY)
         self.prev_point = np.array([[init_loc[0] + init_loc[2] // 2, init_loc[1] + init_loc[3] // 2]], dtype=np.float32)
-        self.last_rois = [tuple(self.prev_point[0])]
+        self.last_rois = [tuple(map(int, self.prev_point[0]))]
 
     def run(self, frame):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -71,8 +71,8 @@ class OpticalFlow(GestureClassifer):
         self.prev_point, st, err = cv.calcOpticalFlowPyrLK(self.prev_frame_gray, frame_gray, self.prev_point, None, **self.lk_params)
         # save as previous params
         self.prev_frame_gray = frame_gray
-        self.last_rois.append(tuple(self.prev_point[0]))
-        color = self.classify(self.last_rois, frame)
+        self.last_rois.append(tuple(map(int, self.prev_point[0])))
+        color = self.classify_with_point(self.last_rois, frame)
         self.draw(frame)
         return color
 
@@ -112,7 +112,7 @@ class TemplateMatching(GestureClassifer):
             x, y = max_loc
         location = (x, y, x + self.loc[2], y + self.loc[3])
         self.last_matching.append(location)
-        color = self.classify(self.last_matching, frame)
+        color = self.classify_with_coords(self.last_matching, frame)
         self.draw(frame, location)
         return color
 

@@ -5,20 +5,34 @@ class GestureClassifer:
         self.classify_quan = classify_quan
         self.classify_error = 50
 
-    def classify(self, last_rois, frame):
+    def classify_with_coords(self, last_rois, frame):
         sample = last_rois[-self.classify_quan:]
         diff_hight_index, diff_hight = self.hight_change(sample)
         diff_width_index, diff_width = self.width_change(sample)
-        # average_x = sum(abs(sample[i][0] - sample[i + 1][0]) for i in range(len(sample) - 1)) / len(sample)
-        # average_y = sum(abs(sample[i][1] - sample[i + 1][1]) for i in range(len(sample) - 1)) / len(sample)
         if diff_hight > self.classify_error or diff_width > self.classify_error:
             return self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
         else:
             color = self.get_dominant_color(frame[sample[-1][1]:sample[-1][1] + sample[-1][3], sample[-1][0]:sample[-1][0] + sample[-1][2]])
             # if pink
-            if 255 > color[2] > 70 and 220 > color[1] > 3 and 225 > color[0] > 40:
+            if 255 > color[2] > 128 and 209 > color[1] > 3 and 220 > color[0] > 40:
                 return 0  # stay in this localization
             else:
+                print(color)
+                return None  # find glove
+
+    def classify_with_point(self, last_points, frame):
+        sample = last_points[-self.classify_quan:]
+        diff_hight_index, diff_hight = self.hight_change(sample)
+        diff_width_index, diff_width = self.width_change(sample)
+        if diff_hight > self.classify_error or diff_width > self.classify_error:
+            return self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
+        else:
+            color = frame[sample[-1][1]][sample[-1][0]]
+            # if pink
+            if 255 > color[2] > 128 and 209 > color[1] > 3 and 220 > color[0] > 40:
+                return 0  # stay in this localization
+            else:
+                print(color)
                 return None  # find glove
 
     def get_dominant_color(self, frame):
