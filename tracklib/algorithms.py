@@ -27,7 +27,7 @@ class Meanshift(GestureClassifer):
         # apply meanshift to get the new location
         _, self.loc = cv.meanShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
-        color = self.classify(self.last_rois)
+        color = self.classify(self.last_rois, frame)
         self.draw(frame)
         return color
 
@@ -52,7 +52,7 @@ class Camshift(Meanshift):
         # apply meanshift to get the new location
         _, self.loc = cv.CamShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
-        color = self.classify(self.last_rois)
+        color = self.classify(self.last_rois, frame)
         self.draw(frame)
         return color
 
@@ -72,7 +72,7 @@ class OpticalFlow(GestureClassifer):
         # save as previous params
         self.prev_frame_gray = frame_gray
         self.last_rois.append(tuple(self.prev_point[0]))
-        color = self.classify(self.last_rois)
+        color = self.classify(self.last_rois, frame)
         self.draw(frame)
         return color
 
@@ -112,7 +112,7 @@ class TemplateMatching(GestureClassifer):
             x, y = max_loc
         location = (x, y, x + self.loc[2], y + self.loc[3])
         self.last_matching.append(location)
-        color = self.classify(self.last_matching)
+        color = self.classify(self.last_matching, frame)
         self.draw(frame, location)
         return color
 

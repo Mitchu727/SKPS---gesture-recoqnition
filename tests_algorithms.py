@@ -18,7 +18,7 @@ def test_effectiveness(path: str, alg: str, correctness: list):
         if gesture == correctness[i]:
             score += 1
         i += 1
-        cv.waitKey(100)
+        cv.waitKey(50)
     cap.release()
     cv.destroyAllWindows()
     percent = score / len(correctness) * 100
@@ -38,7 +38,7 @@ def run_alogirthm(path, alg):
             break
         gesture = tracker.algorithm.run(frame)
         color = tracker.color.convert_gesture(gesture)
-        cv.waitKey(100)
+        cv.waitKey(50)
     cap.release()
     cv.destroyAllWindows()
 

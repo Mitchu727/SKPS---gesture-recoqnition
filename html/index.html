@@ -7,15 +7,15 @@
             html { width: 100%; height: 100%; background: #2c3e53; color: #f5c50f; font-family: sans-serif; font-size: 20px;} 
 
             button {transition: box-shadow 500ms ease-in-out, color 500ms ease-in-out; background-color: transparent;
-                font-weight: 700; margin: 10px; padding: 1em 3em; text-align: center; text-transform: uppercase; width: 350px; border-radius: 0.6rem;
+                font-weight: 700; margin: 10px; padding: 1em 3em; text-align: center; text-transform: uppercase; border-radius: 0.6rem;
                 cursor: pointer; font-size: 20px;}
 
-            #pinkButton {border: 2px solid #d67ed6; color: #d67ed6;}
+            #pinkButton {border: 2px solid #d67ed6; color: #d67ed6;  width: 400px;}
             #pinkButton:hover {box-shadow: 0 0 50px 50px  #d67ed6 inset; color: #ffffff;}
 
-            .algorithms {border: 2px solid #f5c50f; color: #f5c50f;}
+            .algorithms {border: 2px solid #f5c50f; color: #f5c50f;  width: 350px;}
             .algorithms:hover {box-shadow: 0 0 50px 50px  #f5c50f inset; color: #ffffff;}
-            .clicked {border: 2px solid #f5c50f; color: #ffffff; background-color: #f5c50f;} 
+            .clicked {border: 2px solid #f5c50f; color: #ffffff; background-color: #f5c50f; width: 350px;} 
             
             .centering {text-align: center;}
             #square {border:1px solid #000000; background-color: #008080;  border-radius: 0.6rem;}
@@ -28,7 +28,7 @@
             <canvas id="square" width="500" height="500"></canvas>
         </div>
         <p class="centering">
-            <button type="button" id="pinkButton" onclick="findPinkGlove()">Find Pink Glove!</button>
+            <button type="button" id="pinkButton" onclick="findPinkGlove()">Looking for glove...</button>
         </p>
         <p class="centering">
             <button type="button" id="Camshift" onclick="chooseAlgorithm('Camshift')" class="algorithms">Camshift</button>
@@ -38,14 +38,19 @@
         </p>
         <script>
             var ws = new WebSocket("ws://localhost:8000/ws");
-            function updateSquare(event) {
-                var square = document.getElementById("square");
-                var ctx = square.getContext("2d");
-                ctx.fillStyle = event.data;
-                ctx.fillRect(0, 0, square.width, square.height);
+            function updateSite(event) {
+                if (event.data == "LookingFor"){
+                    document.getElementById('pinkButton').innerHTML = 'Looking for glove...';
+                } else {
+                    document.getElementById('pinkButton').innerHTML = 'Find Pink Glove!';
+                    var square = document.getElementById("square");
+                    var ctx = square.getContext("2d");
+                    ctx.fillStyle = event.data;
+                    ctx.fillRect(0, 0, square.width, square.height);
+                }
                 ws.send("Received");
             }
-            ws.onmessage = updateSquare;
+            ws.onmessage = updateSite;
 
             function findPinkGlove(){
                 ws.send("FindMyGlove");

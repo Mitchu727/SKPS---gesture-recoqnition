@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 
 from tracklib.algorithms import Camshift, Meanshift, OpticalFlow, TemplateMatching
-from tracklib.GestureClassifer import ColorPicker
+from tracklib.ColorPicker import ColorPicker
 
 class Tracker:
     def __init__(self, video, algorithm="Meanshift"):

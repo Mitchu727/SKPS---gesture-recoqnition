@@ -30,21 +30,23 @@ async def websocket_endpoint(websocket: WebSocket):
         if app.camera.isOpened():
             # create tracker with chosen algorithm
             app.tracker = Tracker(app.camera)
+            await websocket.send_text("LookingFor")
         while app.camera.isOpened():
             # read frame and run step of algorithm
             _, frame = app.camera.read()
             gesture = app.tracker.algorithm.run(frame)
-            if gesture:
-                color = app.tracker.color.convert_gesture(gesture)
-                # send color
-            await websocket.send_text(color)
+            if gesture is None:
+                app.tracker.update_init_loc(app.camera)
+            data = app.tracker.color.convert_gesture(gesture)
+            # send color | "LookingFor"
+            await websocket.send_text(data)
             # confirmation that client recived data, if there is no answer program stopped
             data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
             if data == "FindMyGlove":
                 app.tracker.update_init_loc(app.camera)
             elif data != "Received":
                 app.tracker.change_algorithm(data, app.camera)
-            cv.waitKey(100)
+            cv.waitKey(50)
     except Exception:
         print("Connection closed")
     finally:
