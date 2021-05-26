@@ -1,6 +1,30 @@
 from tracklib.GestureClassifer import GestureClassifer
 import numpy as np
 import cv2 as cv
+import time
+
+
+def clock_timer(func):
+    def timer(*args, **kwargs):
+        """a decorator which prints execution time of the decorated function"""
+        t1 = time.clock()
+        result = func(*args, **kwargs)
+        t2 = time.clock()
+        print("-- executed in %.4f seconds (clock)" % (t2 - t1))
+        return t2 - t1
+    return timer
+
+
+def time_timer(func):
+    def timer(*args, **kwargs):
+        """a decorator which prints execution time of the decorated function"""
+        t1 = time.clock()
+        result = func(*args, **kwargs)
+        t2 = time.clock()
+        print("-- executed in %.4f seconds (time)" % (t2 - t1))
+        return t2 - t1
+    return timer
+
 
 class Meanshift(GestureClassifer):
     def __init__(self, first_frame, init_loc: tuple):
@@ -20,6 +44,8 @@ class Meanshift(GestureClassifer):
         hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])  # TODO poczytać o mask w calcHist and normalization
         return cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
 
+    @time_timer
+    @clock_timer
     def run(self, frame):
         hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         # find the same object with Back Projection based on histogram
@@ -28,7 +54,7 @@ class Meanshift(GestureClassifer):
         _, self.loc = cv.meanShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
         color = self.classify_with_coords(self.last_rois, frame)
-        self.draw(frame)
+        # self.draw(frame)
         return color
 
     def draw(self, frame):
