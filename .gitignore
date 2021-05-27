@@ -4,3 +4,4 @@ __pycache__/
 vtest-notforgit/
 .pytest_cache/
 html/
+/html
