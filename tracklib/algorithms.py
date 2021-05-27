@@ -1,29 +1,7 @@
 from tracklib.GestureClassifer import GestureClassifer
+from timers import clock_timer, time_timer, timeit_timer
 import numpy as np
 import cv2 as cv
-import time
-
-
-def clock_timer(func):
-    def timer(*args, **kwargs):
-        """a decorator which prints execution time of the decorated function"""
-        t1 = time.clock()
-        result = func(*args, **kwargs)
-        t2 = time.clock()
-        print("-- executed in %.4f seconds (clock)" % (t2 - t1))
-        return t2 - t1
-    return timer
-
-
-def time_timer(func):
-    def timer(*args, **kwargs):
-        """a decorator which prints execution time of the decorated function"""
-        t1 = time.clock()
-        result = func(*args, **kwargs)
-        t2 = time.clock()
-        print("-- executed in %.4f seconds (time)" % (t2 - t1))
-        return t2 - t1
-    return timer
 
 
 class Meanshift(GestureClassifer):
@@ -44,9 +22,7 @@ class Meanshift(GestureClassifer):
         hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])  # TODO poczytać o mask w calcHist and normalization
         return cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
 
-    @time_timer
-    @clock_timer
-    def run(self, frame):
+    def detect(self, frame):
         hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         # find the same object with Back Projection based on histogram
         dst = cv.calcBackProject([hsv_frame], [0], self.roi_hist, [0, 180], 1)
@@ -54,7 +30,6 @@ class Meanshift(GestureClassifer):
         _, self.loc = cv.meanShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
         color = self.classify_with_coords(self.last_rois, frame)
-        # self.draw(frame)
         return color
 
     def draw(self, frame):
@@ -71,7 +46,7 @@ class Meanshift(GestureClassifer):
 
 
 class Camshift(Meanshift):
-    def run(self, frame):
+    def detect(self, frame):
         hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         # find the same object with Back Projection based on histogram
         dst = cv.calcBackProject([hsv_frame], [0], self.roi_hist, [0, 180], 1)
@@ -79,7 +54,6 @@ class Camshift(Meanshift):
         _, self.loc = cv.CamShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
         color = self.classify_with_coords(self.last_rois, frame)
-        self.draw(frame)
         return color
 
 
@@ -91,7 +65,7 @@ class OpticalFlow(GestureClassifer):
         self.prev_point = np.array([[init_loc[0] + init_loc[2] // 2, init_loc[1] + init_loc[3] // 2]], dtype=np.float32)
         self.last_rois = [tuple(map(int, self.prev_point[0]))]
 
-    def run(self, frame):
+    def detect(self, frame):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         # calculate optical flow
         self.prev_point, st, err = cv.calcOpticalFlowPyrLK(self.prev_frame_gray, frame_gray, self.prev_point, None, **self.lk_params)
@@ -99,7 +73,6 @@ class OpticalFlow(GestureClassifer):
         self.prev_frame_gray = frame_gray
         self.last_rois.append(tuple(map(int, self.prev_point[0])))
         color = self.classify_with_point(self.last_rois, frame)
-        self.draw(frame)
         return color
 
     def draw(self, frame):
@@ -128,7 +101,7 @@ class TemplateMatching(GestureClassifer):
         else:
             self.method = cv.TM_CCOEFF
 
-    def run(self, frame):
+    def detect(self, frame):
         res = cv.matchTemplate(frame, self.template, self.method)
         min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
         # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
@@ -139,7 +112,6 @@ class TemplateMatching(GestureClassifer):
         location = (x, y, x + self.loc[2], y + self.loc[3])
         self.last_matching.append(location)
         color = self.classify_with_coords(self.last_matching, frame)
-        self.draw(frame, location)
         return color
 
     def draw(self, frame, location):
