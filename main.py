@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +12,7 @@ from tracklib.Tracker import Tracker
 app = FastAPI()
 app.camera = None
 app.tracker = None
+app.debug = False
 app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 html = ""
 with open('html/index.html', 'r') as f:
@@ -35,6 +37,8 @@ async def websocket_endpoint(websocket: WebSocket):
             # read frame and run step of algorithm
             _, frame = app.camera.read()
             gesture = app.tracker.algorithm.run(frame)
+            if app.debug:
+                app.tracker.algorithm.draw(frame)
             if gesture is None:
                 app.tracker.update_init_loc(app.camera)
             data = app.tracker.color.convert_gesture(gesture)
@@ -56,6 +60,9 @@ async def websocket_endpoint(websocket: WebSocket):
         app.camera = None
         cv.destroyAllWindows()
 
-# for debugging
+
 if __name__ == "__main__":
+    # for debugging and showing camera view
+    if "-d" in sys.argv[1:]:
+        app.debug = True 
     uvicorn.run(app, host="127.0.0.1", port=8000)
