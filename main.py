@@ -25,20 +25,20 @@ async def get():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    print(1)
     await websocket.accept()
     try:
-        app.camera = cv.VideoCapture(0, cv.CAP_DSHOW)
-        app.camera.set(cv.CAP_PROP_FPS, 10)
+        app.camera = cv.VideoCapture(0)
         if app.camera.isOpened():
+            print("a")
             # create tracker with chosen algorithm
             app.tracker = Tracker(app.camera)
             await websocket.send_text("LookingFor")
         while app.camera.isOpened():
             # read frame and run step of algorithm
+            print(2)
             _, frame = app.camera.read()
             gesture = app.tracker.algorithm.run(frame)
-            if app.debug:
-                app.tracker.algorithm.draw(frame)
             if gesture is None:
                 app.tracker.update_init_loc(app.camera)
             data = app.tracker.color.convert_gesture(gesture)
@@ -51,18 +51,21 @@ async def websocket_endpoint(websocket: WebSocket):
                 app.tracker.update_init_loc(app.camera)
             elif data != "Received":
                 app.tracker.change_algorithm(data, app.camera)
-            cv.waitKey(50)
+            if app.debug:
+                app.tracker.algorithm.draw(frame)
+                cv.waitKey(50)
     except Exception:
         print("Connection closed")
     finally:
         await websocket.close()
         app.camera.release()
         app.camera = None
-        cv.destroyAllWindows()
+        if app.debug:
+            cv.destroyAllWindows()
 
 
 if __name__ == "__main__":
     # for debugging and showing camera view
     if "-d" in sys.argv[1:]:
         app.debug = True 
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
