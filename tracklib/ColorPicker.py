@@ -65,7 +65,7 @@ class ColorPicker:
         return "#" + "".join([f"{v:02x}" for v in rgb_color])
 
     def convert_gesture(self, gest_num):
-        if gest_num is None:
+        if gest_num == 0:
             return "LookingFor"
         if gest_num == 1:
             self.sub_value()

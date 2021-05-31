@@ -39,7 +39,7 @@ async def websocket_endpoint(websocket: WebSocket):
             gesture = app.tracker.algorithm.run(frame)
             if app.debug:
                 app.tracker.algorithm.draw(frame)
-            if gesture is None:
+            if gesture == 0:
                 app.tracker.update_init_loc(app.camera)
             data = app.tracker.color.convert_gesture(gesture)
             print(data)
@@ -52,7 +52,8 @@ async def websocket_endpoint(websocket: WebSocket):
             elif data != "Received":
                 app.tracker.change_algorithm(data, app.camera)
             cv.waitKey(50)
-    except Exception:
+    except ValueError as e:
+        print(e)
         print("Connection closed")
     finally:
         await websocket.close()

@@ -6,6 +6,7 @@ from tracklib.ColorPicker import ColorPicker
 
 class Tracker:
     def __init__(self, video, algorithm="Meanshift"):
+        self.queue_size = 30
         self.init_loc, frame = self.find_pink_glove(video)
         self.algorithm = self.choose_algorithm(algorithm, frame)
         self.color = ColorPicker()
@@ -31,13 +32,13 @@ class Tracker:
 
     def choose_algorithm(self, algorithm, frame):
         if algorithm == "Meanshift":
-            return Meanshift(frame, self.init_loc)
+            return Meanshift(frame, self.init_loc, self.queue_size)
         elif algorithm == "Camshift":
-            return Camshift(frame, self.init_loc)
+            return Camshift(frame, self.init_loc, self.queue_size)
         elif algorithm == "OpticalFlow":
-            return OpticalFlow(frame, self.init_loc)
+            return OpticalFlow(frame, self.init_loc, self.queue_size)
         elif algorithm == "TemplateMatching":
-            return TemplateMatching(frame, self.init_loc)
+            return TemplateMatching(frame, self.init_loc, self.queue_size)
 
     def change_algorithm(self, algorithm, video):
         self.init_loc, frame = self.find_pink_glove(video)

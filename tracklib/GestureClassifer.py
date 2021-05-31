@@ -1,23 +1,25 @@
 import numpy as np
 
 class GestureClassifer:
-    def __init__(self, classify_quan=10):
+    def __init__(self, classify_quan=5):
         self.classify_quan = classify_quan
         self.classify_error = 50
 
     def classify_with_coords(self, last_rois, frame):
-        sample = last_rois[-self.classify_quan:]
-        diff_hight_index, diff_hight = self.hight_change(sample)
-        diff_width_index, diff_width = self.width_change(sample)
-        if diff_hight > self.classify_error or diff_width > self.classify_error:
-            return self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
-        else:
-            color = self.get_dominant_color(frame[sample[-1][1]:sample[-1][1] + sample[-1][3], sample[-1][0]:sample[-1][0] + sample[-1][2]])
-            # if pink
-            if 255 > color[2] > 128 and 209 > color[1] > 3 and 220 > color[0] > 40:
-                return 0  # stay in this localization
+        if len(last_rois) == self.classify_quan:
+            sample = [last_rois.popleft() for _i in range(self.classify_quan)]
+            # sample = last_rois[-self.classify_quan:]
+            diff_hight_index, diff_hight = self.hight_change(sample)
+            diff_width_index, diff_width = self.width_change(sample)
+            if diff_hight > self.classify_error or diff_width > self.classify_error:
+                return self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
             else:
-                return None  # find glove
+                color = self.get_dominant_color(frame[sample[-1][1]:sample[-1][1] + sample[-1][3], sample[-1][0]:sample[-1][0] + sample[-1][2]])
+                # if pink
+                if 255 > color[2] > 128 and 209 > color[1] > 3 and 220 > color[0] > 40:
+                    return None  # stay in this localization
+                else:
+                    return 0  # find glove
 
     def classify_with_point(self, last_points, frame):
         sample = last_points[-self.classify_quan:]

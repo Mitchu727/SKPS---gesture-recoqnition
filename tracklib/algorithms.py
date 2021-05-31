@@ -1,14 +1,17 @@
 from tracklib.GestureClassifer import GestureClassifer
 import numpy as np
 import cv2 as cv
+from collections import deque
 
 class Meanshift(GestureClassifer):
-    def __init__(self, first_frame, init_loc: tuple):
+    def __init__(self, first_frame, init_loc: tuple, max_len):
         super().__init__()
+        self.max_len = max_len
         # Setup the termination criteria, either 10 iteration or move by atleast 1 pt
         self.term = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1)
         self.loc = init_loc
-        self.last_rois = [self.loc]
+        self.last_rois = deque(maxlen=max_len)
+        self.last_rois.append(tuple(self.loc))
         # get first frame
         self.roi = first_frame[self.loc[1]:self.loc[1] + self.loc[3], self.loc[0]:self.loc[0] + self.loc[2]]
         self.roi_hist = self.get_histogram()
@@ -38,7 +41,8 @@ class Meanshift(GestureClassifer):
 
     def update_view(self, frame, loc):
         self.loc = loc
-        self.last_rois = [self.loc]
+        self.last_rois = deque(maxlen=self.max_len)
+        self.last_rois.append(tuple(self.loc))
         self.roi = frame[self.loc[1]:self.loc[1] + self.loc[3], self.loc[0]:self.loc[0] + self.loc[2]]
         self.roi_hist = self.get_histogram()
 
@@ -56,12 +60,13 @@ class Camshift(Meanshift):
 
 
 class OpticalFlow(GestureClassifer):
-    def __init__(self, first_frame, init_loc):
+    def __init__(self, first_frame, init_loc, max_len):
         super().__init__()
+        self.max_len = max_len
         self.lk_params = dict(winSize=(20, 20), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
         self.prev_frame_gray = cv.cvtColor(first_frame, cv.COLOR_BGR2GRAY)
         self.prev_point = np.array([[init_loc[0] + init_loc[2] // 2, init_loc[1] + init_loc[3] // 2]], dtype=np.float32)
-        self.last_rois = [tuple(map(int, self.prev_point[0]))]
+        self.last_rois = deque(tuple(map(int, self.prev_point[0])), maxlen=max_len)
 
     def run(self, frame):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -83,16 +88,17 @@ class OpticalFlow(GestureClassifer):
     def update_view(self, frame, loc):
         self.prev_frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         self.prev_point = np.array([[loc[0] + loc[2] // 2, loc[1] + loc[3] // 2]], dtype=np.float32)
-        self.last_rois = [tuple(self.prev_point[0])]
+        self.last_rois = deque(tuple(map(int, self.prev_point[0])), maxlen=self.max_len)
 
 
 class TemplateMatching(GestureClassifer):
     METHODS = ['cv.TM_CCOEFF', 'cv.TM_CCOEFF_NORMED', 'cv.TM_CCORR', 'cv.TM_CCORR_NORMED', 'cv.TM_SQDIFF', 'cv.TM_SQDIFF_NORMED']
 
-    def __init__(self, first_frame, init_loc, method='cv.TM_CCOEFF'):
+    def __init__(self, first_frame, init_loc, max_len, method='cv.TM_CCOEFF'):
         super().__init__()
+        self.max_len = max_len
         self.loc = init_loc
-        self.last_matching = [self.loc]
+        self.last_matching = deque(self.loc, maxlen=max_len)
         self.template = first_frame[self.loc[1]:self.loc[1] + self.loc[3], self.loc[0]:self.loc[0] + self.loc[2]]
         if method in TemplateMatching.METHODS:
             self.method = eval(method)
@@ -119,6 +125,6 @@ class TemplateMatching(GestureClassifer):
 
     def update_view(self, frame, loc):
         self.loc = loc
-        self.last_matching = [self.loc]
+        self.last_matching = deque(self.loc, maxlen=self.max_len)
         self.template = frame[self.loc[1]:self.loc[1] + self.loc[3], self.loc[0]:self.loc[0] + self.loc[2]]
         # TODO method changer
