@@ -112,7 +112,8 @@ class TemplateMatching(GestureClassifer):
         color = self.classify_with_coords(self.last_matching, frame)
         return color
 
-    def draw(self, frame, location):
+    def draw(self, frame):
+        location = self.last_matching[-1]
         frame = cv.rectangle(frame, (location[0], location[1]), (location[2], location[3]), 255, 2)
         cv.imshow('frame', frame)
         cv.waitKey(30) & 0xff

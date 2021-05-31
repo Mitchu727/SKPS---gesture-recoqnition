@@ -25,7 +25,6 @@ async def get():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    print(1)
     await websocket.accept()
     try:
         app.camera = cv.VideoCapture(0)
@@ -63,6 +62,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     # for debugging and showing camera view
+    # change ip in index.html
     if "-d" in sys.argv[1:]:
-        app.debug = True 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+        app.debug = True
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=8000)
