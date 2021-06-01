@@ -17,7 +17,7 @@ class Meanshift(GestureClassifer):
         hsv_roi = cv.cvtColor(self.roi, cv.COLOR_BGR2HSV)
         # get histogram of hue
         mask = cv.inRange(hsv_roi, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
-        hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])  # TODO poczytać o mask w calcHist and normalization
+        hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])
         return cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
 
     def run(self, frame):
@@ -27,6 +27,8 @@ class Meanshift(GestureClassifer):
         # apply meanshift to get the new location
         _, self.loc = cv.meanShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
+        if len(self.last_rois) > 10:
+            del self.last_rois[0]
         color = self.classify_with_coords(self.last_rois, frame)
         return color
 
@@ -51,6 +53,8 @@ class Camshift(Meanshift):
         # apply meanshift to get the new location
         _, self.loc = cv.CamShift(dst, self.loc, self.term)
         self.last_rois.append(self.loc)
+        if len(self.last_rois) > 10:
+            del self.last_rois[0]
         color = self.classify_with_coords(self.last_rois, frame)
         return color
 
@@ -66,10 +70,12 @@ class OpticalFlow(GestureClassifer):
     def run(self, frame):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         # calculate optical flow
-        self.prev_point, st, err = cv.calcOpticalFlowPyrLK(self.prev_frame_gray, frame_gray, self.prev_point, None, **self.lk_params)
+        self.prev_point, _, _ = cv.calcOpticalFlowPyrLK(self.prev_frame_gray, frame_gray, self.prev_point, None, **self.lk_params)
         # save as previous params
         self.prev_frame_gray = frame_gray
         self.last_rois.append(tuple(map(int, self.prev_point[0])))
+        if len(self.last_rois) > 10:
+            del self.last_rois[0]
         color = self.classify_with_point(self.last_rois, frame)
         return color
 
@@ -101,7 +107,7 @@ class TemplateMatching(GestureClassifer):
 
     def run(self, frame):
         res = cv.matchTemplate(frame, self.template, self.method)
-        min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+        _, _, min_loc, max_loc = cv.minMaxLoc(res)
         # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
         if self.method in [cv.TM_SQDIFF, cv.TM_SQDIFF_NORMED]:
             x, y = min_loc
@@ -109,6 +115,8 @@ class TemplateMatching(GestureClassifer):
             x, y = max_loc
         location = (x, y, x + self.loc[2], y + self.loc[3])
         self.last_matching.append(location)
+        if len(self.last_rois) > 10:
+            del self.last_rois[0]
         color = self.classify_with_coords(self.last_matching, frame)
         return color
 

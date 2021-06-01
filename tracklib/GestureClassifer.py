@@ -25,7 +25,7 @@ class GestureClassifer:
         diff_width_index, diff_width = self.width_change(sample)
         if diff_hight > self.classify_error or diff_width > self.classify_error:
             return self.choose_gesture(diff_hight_index, diff_hight, diff_width_index, diff_width)
-        else:
+        elif sample[-1][1] <= frame.shape[0] and sample[-1][0] <= frame.shape[1]:
             color = frame[sample[-1][1]][sample[-1][0]]
             # if pink
             if 255 > color[2] > 128 and 209 > color[1] > 3 and 220 > color[0] > 40:
