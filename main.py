@@ -29,13 +29,16 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
         app.camera = cv.VideoCapture(0)
+        print(app.camera.isOpened())
         if app.camera.isOpened():
             # create tracker with chosen algorithm
             app.tracker = Tracker(app.camera)
             await websocket.send_text("LookingFor")
         while app.camera.isOpened():
             # read frame and run step of algorithm
+            print(1)
             start = time.time()
+            print(start)
             _, frame = app.camera.read()
             gesture = app.tracker.algorithm.run(frame)
             if gesture is None:
