@@ -37,7 +37,7 @@
             <button type="button" id="OpticalFlow" onclick="chooseAlgorithm('OpticalFlow')" class="algorithms">Optical Flow</button>
         </p>
         <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
+            var ws = new WebSocket("ws://192.168.0.228:8000/ws");
             function updateSite(event) {
                 if (event.data == "LookingFor"){
                     document.getElementById('pinkButton').innerHTML = 'Looking for glove...';

@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +12,7 @@ from tracklib.Tracker import Tracker
 app = FastAPI()
 app.camera = None
 app.tracker = None
+app.debug = False
 app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 html = ""
 with open('html/index.html', 'r') as f:
@@ -25,8 +27,7 @@ async def get():
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
-        app.camera = cv.VideoCapture(0, cv.CAP_DSHOW)
-        app.camera.set(cv.CAP_PROP_FPS, 10)
+        app.camera = cv.VideoCapture(0)
         if app.camera.isOpened():
             # create tracker with chosen algorithm
             app.tracker = Tracker(app.camera)
@@ -38,7 +39,6 @@ async def websocket_endpoint(websocket: WebSocket):
             if gesture is None:
                 app.tracker.update_init_loc(app.camera)
             data = app.tracker.color.convert_gesture(gesture)
-            print(data)
             # send color | "LookingFor"
             await websocket.send_text(data)
             # confirmation that client recived data, if there is no answer program stopped
@@ -47,15 +47,24 @@ async def websocket_endpoint(websocket: WebSocket):
                 app.tracker.update_init_loc(app.camera)
             elif data != "Received":
                 app.tracker.change_algorithm(data, app.camera)
-            cv.waitKey(50)
+            if app.debug:
+                app.tracker.algorithm.draw(frame)
+                cv.waitKey(50)
     except Exception:
         print("Connection closed")
     finally:
         await websocket.close()
         app.camera.release()
         app.camera = None
-        cv.destroyAllWindows()
+        if app.debug:
+            cv.destroyAllWindows()
 
-# for debugging
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    # for debugging and showing camera view
+    # change ip in index.html
+    if "-d" in sys.argv[1:]:
+        app.debug = True
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=8000)
