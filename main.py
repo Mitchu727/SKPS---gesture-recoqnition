@@ -6,29 +6,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 import cv2 as cv
 import uvicorn
+import time
 
-from timers import time_timer
 from tracklib.Tracker import Tracker
-
-@time_timer
-async def step(app, websocket):
-    # read frame and run step of algorithm
-    _, frame = app.camera.read()
-    gesture = app.tracker.algorithm.run(frame)
-    if gesture is None:
-        app.tracker.update_init_loc(app.camera)
-    data = app.tracker.color.convert_gesture(gesture)
-    # send color | "LookingFor"
-    await websocket.send_text(data, WebSocket)
-    # confirmation that client recived data, if there is no answer program stopped
-    data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
-    if data == "FindMyGlove":
-        app.tracker.update_init_loc(app.camera)
-    elif data != "Received":
-        app.tracker.change_algorithm(data, app.camera)
-    if app.debug:
-        app.tracker.algorithm.draw(frame)
-        cv.waitKey(50)
 
 
 app = FastAPI()
@@ -56,7 +36,26 @@ async def websocket_endpoint(websocket: WebSocket):
             app.tracker = Tracker(app.camera)
             await websocket.send_text("LookingFor")
         while app.camera.isOpened():
-            step(app, websocket)
+            # read frame and run step of algorithm
+            start = time.time()
+            _, frame = app.camera.read()
+            gesture = app.tracker.algorithm.run(frame)
+            if gesture is None:
+                app.tracker.update_init_loc(app.camera)
+            data = app.tracker.color.convert_gesture(gesture)
+            # send color | "LookingFor"
+            await websocket.send_text(data, WebSocket)
+            # confirmation that client recived data, if there is no answer program stopped
+            data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
+            if data == "FindMyGlove":
+                app.tracker.update_init_loc(app.camera)
+            elif data != "Received":
+                app.tracker.change_algorithm(data, app.camera)
+            if app.debug:
+                app.tracker.algorithm.draw(frame)
+                cv.waitKey(50)
+            end = time.time()
+            print(end - start)
     except Exception:
         print("Connection closed")
     finally:
@@ -70,7 +69,7 @@ async def websocket_endpoint(websocket: WebSocket):
 if __name__ == "__main__":
     # for debugging and showing camera view
     # change ip in index.html
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    app.debug = True
     if "-d" in sys.argv[1:]:
         app.debug = True
         uvicorn.run(app, host="127.0.0.1", port=8000)
