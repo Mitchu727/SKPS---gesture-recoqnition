@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 import cv2 as cv
 import uvicorn
+import time
 
 from tracklib.Tracker import Tracker
 
@@ -34,6 +35,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_text("LookingFor")
         while app.camera.isOpened():
             # read frame and run step of algorithm
+            start = time.time()
             _, frame = app.camera.read()
             gesture = app.tracker.algorithm.run(frame)
             if gesture is None:
@@ -50,6 +52,8 @@ async def websocket_endpoint(websocket: WebSocket):
             if app.debug:
                 app.tracker.algorithm.draw(frame)
                 cv.waitKey(50)
+            end = time.time()
+            print(end - start)
     except Exception:
         print("Connection closed")
     finally:
