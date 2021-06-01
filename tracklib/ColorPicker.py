@@ -12,7 +12,7 @@ class ColorPicker:
         self.__hue = 180
         self.__saturation = 100
         self.__value = 50
-        self.changer = 10
+        self.changer = 1
 
     @property
     def changer(self):

@@ -39,6 +39,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if gesture is None:
                 app.tracker.update_init_loc(app.camera)
             data = app.tracker.color.convert_gesture(gesture)
+            print(data)
             # send color | "LookingFor"
             await websocket.send_text(data)
             # confirmation that client recived data, if there is no answer program stopped
