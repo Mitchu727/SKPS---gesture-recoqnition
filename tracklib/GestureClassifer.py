@@ -3,7 +3,7 @@ import numpy as np
 class GestureClassifer:
     def __init__(self, classify_quan=10):
         self.classify_quan = classify_quan
-        self.classify_error = 50
+        self.classify_error = 25
 
     def classify_with_coords(self, last_rois, frame):
         sample = last_rois[-self.classify_quan:]

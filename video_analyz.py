@@ -1,5 +1,6 @@
 import cv2 as cv
 from tracklib.Tracker import Tracker
+import time
 
 path = "vtest/vtest1.mp4"
 alg = "OpticalFlow"
@@ -7,6 +8,8 @@ alg = "OpticalFlow"
 gestures = []
 cap = cv.VideoCapture(path)
 cap.set(cv.CAP_PROP_FPS, 10)
+start = time.time()
+frame_numerator = 0
 if cap.isOpened():
     tracker = Tracker(cap, algorithm=alg)
 while cap.isOpened():
@@ -20,6 +23,9 @@ while cap.isOpened():
         print(gestures)
         tracker.algorithm.draw(frame)
         cv.waitKey(1)
+        frame_numerator += 1
+end = time.time()
+print(frame_numerator / (end - start))
 cap.release()
 cv.destroyAllWindows()
 print(gestures)
