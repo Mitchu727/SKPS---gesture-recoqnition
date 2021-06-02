@@ -4,6 +4,7 @@ import numpy as np
 from tracklib.algorithms import Camshift, Meanshift, OpticalFlow, TemplateMatching
 from tracklib.ColorPicker import ColorPicker
 
+
 class Tracker:
     def __init__(self, video, algorithm="Meanshift"):
         self.init_loc, frame = self.find_pink_glove(video)

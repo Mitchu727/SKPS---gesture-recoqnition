@@ -1,6 +1,8 @@
 from tracklib.GestureClassifer import GestureClassifer
+from timers import clock_timer, time_timer, timeit_timer
 import numpy as np
 import cv2 as cv
+
 
 class Meanshift(GestureClassifer):
     def __init__(self, first_frame, init_loc: tuple):
@@ -21,7 +23,7 @@ class Meanshift(GestureClassifer):
         hist = cv.calcHist([hsv_roi], [0], mask, [180], [0, 180])
         return cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
 
-    def run(self, frame):
+    def detect(self, frame):
         hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         # find the same object with Back Projection based on histogram
         dst = cv.calcBackProject([hsv_frame], [0], self.roi_hist, [0, 180], 1)
@@ -74,7 +76,7 @@ class OpticalFlow(GestureClassifer):
         # a list to help deduce the last move you made
         self.prev_points = [tuple(map(int, self.prev_point[0]))]
 
-    def run(self, frame):
+    def detect(self, frame):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         # calculate optical flow
         self.prev_point, _, _ = cv.calcOpticalFlowPyrLK(self.prev_frame_gray, frame_gray, self.prev_point, None, **self.lk_params)
@@ -117,7 +119,7 @@ class TemplateMatching(GestureClassifer):
         else:
             self.method = cv.TM_CCOEFF
 
-    def run(self, frame):
+    def detect(self, frame):
         res = cv.matchTemplate(frame, self.template, self.method)
         _, _, min_loc, max_loc = cv.minMaxLoc(res)
         # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum

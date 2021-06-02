@@ -1,4 +1,6 @@
 import numpy as np
+from timers import clock_timer, time_timer, timeit_timer
+
 
 class GestureClassifer:
     def __init__(self, classify_quan=10):
@@ -21,6 +23,12 @@ class GestureClassifer:
                 return 0  # stay in this localization
             else:
                 return None  # find glove
+
+    @clock_timer
+    def run(self, frame, *args):
+        color = self.detect(frame)
+        # self.draw(frame)
+        return color
 
     def classify_with_point(self, last_points, frame):
         # for algorithms with point of interest

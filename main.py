@@ -6,8 +6,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 import cv2 as cv
 import uvicorn
+import time
 
 from tracklib.Tracker import Tracker
+
 
 app = FastAPI()
 # after connecting with websocket set camera to VideoCapture object
@@ -15,12 +17,14 @@ app.camera = None
 # and set tracker object to manage algorithms
 app.tracker = None
 app.debug = False
+
 # mount css file
 app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 # and read html file
 html = ""
 with open('html/index.html', 'r') as f:
     html = f.read()
+
 
 @app.get("/")
 async def get():
@@ -39,6 +43,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 await websocket.send_text("LookingFor")
         while app.camera.isOpened():
             # read frame and run step of algorithm
+            start = time.time()
             _, frame = app.camera.read()
             gesture = app.tracker.algorithm.run(frame)
             # if the glove is lost
