@@ -9,7 +9,7 @@ def clock_timer(func):
         result = func(*args, **kwargs)
         t2 = time.clock()
         print("%s executed in %.4f seconds" % (func.__name__, (t2 - t1)))
-        log(t2-t1)
+        log(t2 - t1)
         return result
     return timer
 
@@ -21,7 +21,7 @@ def time_timer(func):
         result = func(*args, **kwargs)
         t2 = time.time()
         print("%s executed in %.4f seconds" % (func.__name__, (t2 - t1)))
-        log(t2-t1)
+        log(t2 - t1)
         return result
     return timer
 
