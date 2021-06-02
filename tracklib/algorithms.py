@@ -115,8 +115,8 @@ class TemplateMatching(GestureClassifer):
             x, y = max_loc
         location = (x, y, x + self.loc[2], y + self.loc[3])
         self.last_matching.append(location)
-        if len(self.last_rois) > 10:
-            del self.last_rois[0]
+        if len(self.last_matching) > 10:
+            del self.last_matching[0]
         color = self.classify_with_coords(self.last_matching, frame)
         return color
 

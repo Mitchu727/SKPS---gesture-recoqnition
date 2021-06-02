@@ -10,7 +10,8 @@ class Tracker:
         self.algorithm = self.choose_algorithm(algorithm, frame)
         self.color = ColorPicker()
 
-    def find_pink_glove(self, video):
+    def find_pink_glove(self, video: cv.VideoCapture):
+        # algorithm which is trying to find pink glove - tracked object in our implementation
         loc = None
         while loc is None:
             _, frame = video.read()
@@ -25,7 +26,8 @@ class Tracker:
                 loc = cv.boundingRect(pink_area)
         return loc, frame
 
-    def update_init_loc(self, video):
+    def update_init_loc(self, video: cv.VideoCapture):
+        # called when the tracked object is lost
         self.init_loc, frame = self.find_pink_glove(video)
         self.algorithm.update_view(frame, self.init_loc)
 

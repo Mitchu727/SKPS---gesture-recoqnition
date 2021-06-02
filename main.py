@@ -10,10 +10,14 @@ import uvicorn
 from tracklib.Tracker import Tracker
 
 app = FastAPI()
+# after connecting with websocket set camera to VideoCapture object
 app.camera = None
+# and set tracker object to manage algorithms
 app.tracker = None
 app.debug = False
+# mount css file
 app.mount("/resources", StaticFiles(directory="resources"), name="resources")
+# and read html file
 html = ""
 with open('html/index.html', 'r') as f:
     html = f.read()
@@ -22,7 +26,7 @@ with open('html/index.html', 'r') as f:
 async def get():
     return HTMLResponse(html)
 
-
+# websocket endpoint with camera operations
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -36,12 +40,12 @@ async def websocket_endpoint(websocket: WebSocket):
             # read frame and run step of algorithm
             _, frame = app.camera.read()
             gesture = app.tracker.algorithm.run(frame)
+            # if the glove is lost
             if gesture is None:
                 app.tracker.update_init_loc(app.camera)
-            data = app.tracker.color.convert_gesture(gesture)
-            print(data)
+            color = app.tracker.color.convert_gesture(gesture)
             # send color | "LookingFor"
-            await websocket.send_text(data)
+            await websocket.send_text(color)
             # confirmation that client recived data, if there is no answer program stopped
             data = await asyncio.wait_for(websocket.receive_text(), timeout=5)
             if data == "FindMyGlove":
@@ -54,6 +58,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception:
         print("Connection closed")
     finally:
+        # close the websocket and the camera
         await websocket.close()
         app.camera.release()
         app.camera = None
