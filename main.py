@@ -31,7 +31,7 @@ async def get():
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
-        app.camera = cv.VideoCapture(0)
+        app.camera = cv.VideoCapture(0, cv.CAP_DSHOW)
         if app.camera.isOpened():
             # create tracker with chosen algorithm
             app.tracker = Tracker(app.camera)
